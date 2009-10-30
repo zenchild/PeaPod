@@ -1,0 +1,28 @@
+%h1 Upload
+:javascript
+  function validate_form(form) {
+    var reason = "";
+    reason += validate_empty(form.file);
+    
+    if (reason != "") {
+      alert("Some fields need correction:\n" + reason);
+      return false;
+    }
+    return true;
+  }
+
+
+%form{:action=>"/upload",:method=>"post",:enctype=>"multipart/form-data",:onsubmit=>"return validate_form(this)"}
+  -if( channels.length == 1 )
+    %select{:name=>'channel'}
+      %option{:selected => true, :value=>channels[0].id}
+        = channels[0].title
+    %label Select Channel
+    %br/
+  -else
+    -channels.each do |chan|
+      %select
+        %option{:value=>chan.id}
+          = chan.title
+  %input{:type=>"file",:name=>"file"}
+  %input{:type=>"submit",:value=>"Upload"}

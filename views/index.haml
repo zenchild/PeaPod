@@ -1,0 +1,13 @@
+%h2 Channels
+- @channels.each do |chan|
+  %a{:class=>'channel_link',:href => "/?channel=#{chan.id}" }
+    = chan.title
+  %a{:href=>"/rss?channel=#{chan.id}"} [View RSS]
+  %hr/
+  -chan.podcasts.each do |pod|
+    -id3 = id3_from_file(File.split(pod.filepath).last)
+    =id3.title
+    %br/
+  %br/
+  %br/
+  %br/

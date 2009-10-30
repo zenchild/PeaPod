@@ -1,0 +1,11 @@
+%form{:action=>"/new_channel",:method=>"post"}
+  %input{:type=>"text", :id=>'channel_name', :name=>"channel_name"}
+  %label{:for=>'channel_name'} Channel Name
+  %br/
+  %input{:type=>"text", :id=>"channel_description", :name=>"channel_description"}
+  %label{:for=>'channel_description'} Channel Description
+  %br/
+  %input{:type=>"text",:id=>'channel_link',:name=>"channel_link"}
+  %label{:for=>'channel_link'} Channel Link
+  %br/
+  %input{:type=>"submit",:value=>"Submit"}
