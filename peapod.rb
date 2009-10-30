@@ -20,13 +20,14 @@
 $: << File.split(__FILE__).first + '/lib'
 require 'rubygems'
 require 'sinatra/base'
+require "sinatra/authorization"
 require 'rss/maker'
 require 'haml'
 require 'id3lib'
 require 'time'
+require 'dm-core'
 require 'pod_channel'
 require 'pod_cast'
-require 'dm-core'
 
 module Peapod
 
@@ -42,20 +43,19 @@ class Peapod < Sinatra::Base
 	@DEBUG = false
 	VERSION=1.0
 
+	
 	configure :development do
-		puts "*** CONFIG DEV"
 		DataMapper.setup(
 			:default, "sqlite3:///#{Dir.pwd}/devel.db")
 	end
 	configure :production do
-		puts "*** CONFIG PROD"
 		DataMapper.setup(
 			:default, "sqlite3:///#{Dir.pwd}/prod.db")
 	end
 	DataMapper.auto_upgrade!
 
 	before do
-		puts "*** BEFORE"
+		login_required
 		@poddir = './podcasts'
 		@channels ||= Channel.all
 	end
@@ -109,8 +109,6 @@ class Peapod < Sinatra::Base
 			f.write(blk)
 		end
 		f.close
-		puts "NEWFILE: " + new_file
-		puts "NEWFILE FP: " + fpath(new_file)
 		haml :edit_file, :locals => {:new_file => new_file}
 	end
 	
@@ -231,8 +229,16 @@ class Peapod < Sinatra::Base
 	# --------- Helpers --------- #
 	
 	helpers do
-		puts "*** HELPERS"
-		#include Sinatra::Authorization
+		include Sinatra::Authorization
+		require 'loginhash'
+
+		def authorization_realm
+			"Peapod Realm"
+		end
+
+		def authorize(login, password)
+			LOGINHASH[login] == password
+		end
 
 		def partial(template, *args)
 			options = args.last.is_a?(Hash) ? args.last : {}
