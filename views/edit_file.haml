@@ -23,7 +23,7 @@
     - datestr += year
   - else
     - datestr = ''
-%form{:action=>"/edit",:method=>"post",:onsubmit=>"return validate_form(this)"}
+%form{:action=>"edit",:method=>"post",:onsubmit=>"return validate_form(this)"}
   %input{:type=>"text", :id=>'presentation', :name=>"presentation", :value=>tf.title}
   %label{:for=>'presentation'} Presentation
   %br/
