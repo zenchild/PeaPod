@@ -55,7 +55,7 @@ class Peapod < Sinatra::Base
 	DataMapper.auto_upgrade!
 
 	before do
-		login_required
+		login_required unless request.path =~ /^\/rss/
 		@poddir = './podcasts'
 		@channels ||= Channel.all
 	end
