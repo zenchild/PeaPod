@@ -12,7 +12,7 @@
   }
 
 
-%form{:action=>"/upload",:method=>"post",:enctype=>"multipart/form-data",:onsubmit=>"return validate_form(this)"}
+%form{:action=>"upload",:method=>"post",:enctype=>"multipart/form-data",:onsubmit=>"return validate_form(this)"}
   -if( channels.length == 1 )
     %select{:name=>'channel'}
       %option{:selected => true, :value=>channels[0].id}
