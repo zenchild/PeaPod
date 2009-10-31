@@ -1,8 +1,9 @@
 %h2= channel.title
-%a{:href=>"/rss?channel=#{channel.id}"}View RSS
+%a{:href=>"rss?channel=#{channel.id}"} [View RSS]
+%a{:href=>"delete_channel?channel=#{channel.id}"} [Delete Channel]
 %br/
 - channel.podcasts.each do |pod|
-  - fname = File.split(pod.filepath).last
+  - fname = pod.filename
   - id3 =  id3_from_file(fname)
   %br/
   %strong= id3.artist
@@ -11,7 +12,7 @@
   %br/
   %strong= id3.comment.gsub(/\n/, '<br/>') unless id3.comment.nil?
   %br/
-  %a{:href=>"/edit?file=#{fname}"}edit details
+  %a{:href=>"edit?file=#{fname}"}edit details
   %br/
-  %a{:href=>"/delete?file=#{fname}"}delete podcast
+  %a{:href=>"delete?file=#{fname}"}delete podcast
   %hr/

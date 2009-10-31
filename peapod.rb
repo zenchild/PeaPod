@@ -79,7 +79,7 @@ class Peapod < Sinatra::Base
 		link = params[:channel_link]
 		chan = Channel.new(:title => title, :description => descr, :link => link)
 		chan.save
-		redirect '/'
+		redirect './'
 	end
 
 	get '/upload' do
@@ -87,7 +87,7 @@ class Peapod < Sinatra::Base
 		if( channels.length > 0 )
 			haml :upload, :locals => {:channels => channels}
 		else
-			redirect '/new_channel'
+			redirect 'new_channel'
 		end
 	end
 
@@ -100,7 +100,7 @@ class Peapod < Sinatra::Base
 		end
 		pcast = Podcast.new
 		new_file = Time.now.to_i.to_s  + "_#{name}"
-		pcast.filepath = fpath(new_file)
+		pcast.filename = new_file
 		pcast.channel_id = params[:channel]
 		pcast.save
 
@@ -114,7 +114,7 @@ class Peapod < Sinatra::Base
 	
 	get '/edit' do
 		if params[:file] == nil
-			redirect '/'
+			redirect './'
 		end
 		haml :edit_file, :locals => {:new_file => params[:file]}
 	end
@@ -135,39 +135,57 @@ class Peapod < Sinatra::Base
 			end
 		end
 		tf.update!
-		redirect '/'
+		redirect './'
 	end
 
 	get '/delete' do
 		if params[:file] == nil
-			redirect '/'
+			redirect './'
 		end
 		file = fpath(params[:file])
 		if( File.exists? file )
 			File.unlink file
 		end
 
-		pcast = Podcast.first(:filepath => file)
+		pcast = Podcast.first(:filename => params[:file])
 		pcast.destroy!
-		redirect '/'
+		redirect './'
 	end
+
+	get '/delete_channel' do
+		if params[:channel] == nil
+			redirect './'
+		end
+		chan = Channel.get(params[:channel])
+		chan.podcasts.each do |pod|
+			f = fpath(pod.filename)
+			if( File.exists? f )
+				File.unlink f
+			end
+			pod.destroy!
+		end
+		chan.destroy!
+		redirect './'
+	end
+
+
 
 	get '/download/*' do
 		file = params['splat'].first
-		send_file file,
-			{ :filename => File.split(file).last }
+		send_file fpath(file),
+			{ :filename => file }
 	end
 
 	get '/rss' do
 		if( params[:channel] )
-			redirect "/rss2.0?channel=#{params[:channel]}"
+			redirect "rss2.0?channel=#{params[:channel]}"
 		else
-			redirect '/'
+			redirect './'
 		end
 	end
 
 	get '/rss2.0' do
-		redirect '/' unless( params[:channel] )
+		redirect './' unless( params[:channel] )
 
 		chan = Channel.get(params[:channel])
 
@@ -179,13 +197,15 @@ class Peapod < Sinatra::Base
 			m.items.do_sort = true # sort items by date
 
 			chan.podcasts.each do |pod|
-				id3 = id3_from_file(File.split(pod.filepath).last)
+				id3 = id3_from_file(pod.filename)
 				date = from_id3date(id3.date, id3.year)
 				date = Time.parse(date)
 				i = m.items.new_item
 				i.title = id3.title
 				i.description = id3.comment.gsub(/\n/,'<br/>')
-				i.link = "http://localhost:9292/download/#{pod.filepath}"
+				link = request.url
+				link = link.sub(/rss2.0.*$/,'')
+				i.link = link + "download/#{pod.filename}"
 				i.date = date
 			end
 		end
@@ -207,7 +227,7 @@ class Peapod < Sinatra::Base
 	
 	get '/deleteSession' do
 		deleteSession(response)
-		redirect '/'
+		redirect './'
 	end
 
 	get '/migrate' do

@@ -1,11 +1,12 @@
 %h2 Channels
 - @channels.each do |chan|
-  %a{:class=>'channel_link',:href => "/?channel=#{chan.id}" }
+  %a{:class=>'channel_link',:href => "?channel=#{chan.id}" }
     = chan.title
-  %a{:href=>"/rss?channel=#{chan.id}"} [View RSS]
+  %a{:href=>"rss?channel=#{chan.id}"} [View RSS]
+  %a{:href=>"delete_channel?channel=#{chan.id}"} [Delete Channel]
   %hr/
   -chan.podcasts.each do |pod|
-    -id3 = id3_from_file(File.split(pod.filepath).last)
+    -id3 = id3_from_file(pod.filename)
     =id3.title
     %br/
   %br/
