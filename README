@@ -1,1 +1,14 @@
 A Sinatra driven podcast management application.
+
+QUICKSTART
+===========
+1) Configure peapod_conf.rb to your liking.
+2) Edit loginhash.rb with user/password info.
+	* yes I know this is lame, but it's all I have right now.
+	  hopefully I'll get around to making this better soon.
+3) Run: rackup config.ru
+4) Browse to:  http://<host>:5880/
+5) Create a new channel.
+6) Upload a new mp3 to the channel.
+7) Subscribe to http://<host>:5880/rss
+

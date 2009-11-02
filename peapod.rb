@@ -32,31 +32,16 @@ require 'pod_cast'
 module Peapod
 
 class Peapod < Sinatra::Base
-	set :app_file, __FILE__
-	set :root, File.dirname(__FILE__)
-	set :static, true
-	set :sessions, true
-	set :environment, :production
-	set :logging, true
-	set :run, true
 	attr_reader :title
 	@DEBUG = false
 	VERSION=1.0
 
+	load 'peapod_conf.rb'
 	
-	configure :development do
-		DataMapper.setup(
-			:default, "sqlite3:///#{Dir.pwd}/devel.db")
-	end
-	configure :production do
-		DataMapper.setup(
-			:default, "sqlite3:///#{Dir.pwd}/prod.db")
-	end
 	DataMapper.auto_upgrade!
 
 	before do
 		login_required unless request.path =~ /^\/rss/
-		@poddir = './podcasts'
 		@channels ||= Channel.all
 	end
 
@@ -294,7 +279,7 @@ class Peapod < Sinatra::Base
 		end
 
 		def fpath(fname)
-			return "#{@poddir}/#{fname}"
+			return "#{options.podcast_dir}/#{fname}"
 		end
 	end  # end helpers
 	
