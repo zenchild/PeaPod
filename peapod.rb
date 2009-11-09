@@ -41,7 +41,7 @@ class Peapod < Sinatra::Base
 	DataMapper.auto_upgrade!
 
 	before do
-		login_required unless request.path =~ /^\/rss/
+		login_required unless request.path =~ /^\/rss/ or request.path =~ /^\/download/
 		@channels ||= Channel.all
 	end
 
